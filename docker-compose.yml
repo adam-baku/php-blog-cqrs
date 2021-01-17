@@ -1,0 +1,39 @@
+version: '3.3'
+
+services:
+  mysql:
+    image: mariadb:10.5.8
+    container_name: qpony_mysql
+    ports:
+      - 3306:3306
+    env_file:
+      - ./.docker/mysql/.env.dev
+
+  php:
+    container_name: qpony_php
+    build:
+      context: ./.docker/php
+    volumes:
+      - ./blog:/var/www/blog
+      - ./.docker/php/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    working_dir: /var/www/blog
+    environment:
+      PHP_XDEBUG_ENABLED: 1
+      XDEBUG_CONFIG: client_host=host.docker.internal
+      XDEBUG_IDE_KEY: PHPSTORM
+    depends_on:
+      - mysql
+    expose:
+      - 9000
+
+  nginx:
+    container_name: qpony_nginx
+    build:
+      context: ./.docker/nginx
+    ports:
+      - 8000:8000
+    depends_on:
+      - php
+    volumes:
+      - ./blog/public:/var/www/blog/public:ro
+      - ./.docker/nginx/conf.d/blog.conf:/etc/nginx/conf.d/blog.conf

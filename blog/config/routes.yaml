@@ -1,0 +1,14 @@
+get_posts:
+    path: /api/post
+    methods: GET
+    controller: App\UI\Http\Rest\PostController::getList
+
+get_post:
+    path: /api/post/{id}
+    methods: GET
+    controller: App\UI\Http\Rest\PostController::getById
+
+add_post:
+    path: /api/post
+    methods: POST
+    controller: App\UI\Http\Rest\PostController::addNewPost
